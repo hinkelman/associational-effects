@@ -6,13 +6,29 @@ I never wrote these results up for a journal (see [Caveats](#caveats)), but ther
 
 ## Background
 
-Experimental food patches were plastic trays of sand with a known mass of seeds mixed in. After a day of foraging, the sand was sieved and the remaining seeds weighed to get the giving-up density (GUD). Seeds were either *untreated* sunflower seeds (palatable) or sunflower seeds soaked in oxalic acid (*oxalate*; less palatable). One pair of experiments used oats in place of oxalate seeds.
+### Study site and foragers
 
-Both cottontail rabbits and hispid cotton rats foraged from trays at the site. The cotton rats did not seem to forage far from their burrows, so trays for these experiments were placed away from rat burrows, and I believe rabbits were the main foragers. See [Caveats](#caveats).
+The experiments were run at the Native Rangeland Teaching and Research Area in Lubbock, Texas. The site is about 60 ha of shortgrass prairie dominated by blue grama and buffalo grass, with scattered mesquite. Cottontails (*Sylvilagus* spp.) are abundant there, while small mammals are otherwise neither abundant nor diverse.
+
+Rabbits were often seen foraging in the trays and readily ate the seeds, even though they are herbivores. Hispid cotton rats also foraged from trays at the site. They seemed to stay close to their burrows, so trays were placed away from rodent burrows and runways. See [Caveats](#caveats).
+
+### Methods
+
+Each food patch was a plastic nursery tray (56 × 28 × 7 cm) holding 3.8 L of sand, with a known mass of husked sunflower seeds mixed in. Trays were set out after sunset and collected before sunrise. The remaining seeds were then sifted from the sand, cleaned, sorted by type, and weighed to the nearest 0.01 g. That remaining amount is the giving-up density (GUD).
+
+Seeds were either *untreated* (palatable) or *oxalate*. Oxalate seeds were soaked for 2 hours in a 15% (w/v) oxalic acid solution, oven-dried at 65 °C for 2 hours, then air-dried for at least 24 hours, following Schmidt et al. (1998) and Schmidt (2000). The treatment bleaches the seeds, which made the two types easy to tell apart when sorting. One pair of experiments used oats in place of oxalate seeds.
+
+Trays were set side by side at 6–8 stations at least 50 m apart, and each station received the full set of treatments every night. A Latin square randomized which tray got which treatment across the 4–5 nights of each experiment.
 
 The design closely follows [Emerson et al. (2012)](https://doi.org/10.1007/s00442-011-2144-4), who ran similar experiments with fox and gray squirrels in Illinois. My graduate advisor, Ken Schmidt, is a co-author on that paper. Comparing their squirrels with my rabbits is part of what makes these data interesting.
 
-The response variable throughout is the proportion of seeds harvested (1 − GUD / initial amount), analyzed on the logit scale with a random effect of station. Within-patch selectivity uses Manly's index (`Functions.R`): 0.5 means that seeds were taken in proportion to their availability, and values above 0.5 mean that untreated seeds were preferred.
+### Analysis
+
+The response variable throughout is the proportion of seeds harvested (1 − GUD / initial amount), analyzed on the logit scale with a random effect of station. My original analysis plan also treated night as a random effect; the current scripts don't. Within-patch selectivity uses Manly's index (`Functions.R`): 0.5 means that seeds were taken in proportion to their availability, and values above 0.5 mean that untreated seeds were preferred.
+
+### Theory
+
+These experiments were framed around a forager with a fixed *quitting harvest rate*: it leaves a patch once its rate of finding food falls to a set threshold. Because that rate depends on how much food is left, such a forager should leave every patch of a given food at the same GUD, whatever the starting amount. So the proportion harvested should rise with the initial amount. If the forager behaves this way for both foods, a neighbor's effect should depend only on how much of each food is in the patch.
 
 ## The story
 
@@ -32,13 +48,18 @@ This is the same asymmetry that Emerson et al. found among patches in their Expe
 
 ### 2. Why the asymmetry: rabbits track the density of good food, not bad food
 
-In trays with a single food type at 8–20 g, the proportion of untreated seeds harvested rose with initial amount (about 0.51 → 0.62). The proportion of oxalate seeds harvested stayed flat (about 0.27–0.32) (food × amount interaction, p = 0.07).
+The patch assessment experiment tested the quitting-harvest-rate prediction directly. Trays held 8, 12, 16, or 20 g of a single food type. Two of the eight stations had almost no foraging and were left out of the data.
+
+- **Untreated seeds:** mean GUD rose from 3.9 to 7.8 g across that range, more slowly than the starting amount. So the proportion harvested rose (about 0.51 → 0.62). That is partway toward the equal GUDs that a fixed quitting harvest rate predicts.
+- **Oxalate seeds:** mean GUD rose roughly in step with the starting amount (5.6 → 14.2 g). The proportion harvested stayed flat at about 0.27–0.32, with no sign of a quitting harvest rate at all.
+
+The difference between the two foods is marginal (food × amount interaction, p = 0.07).
 
 ![](figures/PatchAssessment.png)
 
 If the rabbits judge a patch by how much good food it holds, the asymmetry follows. Adding untreated seeds makes a patch worth working longer, and the oxalate seeds are caught up in that extra effort. Adding oxalate seeds doesn't make the patch any less worth working, so the untreated seeds gain nothing.
 
-The composition × density experiment points the same way. Doubling total density increased harvest when 25% of the seeds were oxalate, but not when 75% were oxalate. The interaction is not significant, so treat it as suggestive.
+The composition × density experiment points the same way. It crossed total amount (8 g vs. 16 g) with oxalate share (25% vs. 75%). If rabbits used a fixed quitting harvest rate for both foods, amount and share should have had independent effects. Instead, doubling the total increased harvest when 25% of the seeds were oxalate, but not when 75% were. The interaction is not significant, so treat this as suggestive.
 
 ![](figures/CompDensity.png)
 
@@ -56,7 +77,7 @@ Within mixed trays, rabbits were barely selective: Manly's index was 0.52–0.58
 | Mixed | 0.64 | 0.61 | 0.53 |
 | Separated halves | 0.87 | 0.45 | 0.76 |
 
-Mixing the foods pushes their fates together: some refuge for the untreated seeds and shared doom for the oxalate seeds. Separating them lets the rabbits sort the food themselves, and both associational effects disappear.
+I predicted refuge for untreated seeds and shared doom for oxalate seeds in mixed trays. If the rabbits could perceive the split, I expected neither effect in separated trays. That is what happened. Mixing pushes the fates of the two foods together, while separating them lets the rabbits sort the food themselves, and both associational effects disappear.
 
 ![](figures/Scale.png)
 
@@ -84,9 +105,9 @@ The replacement series also shows the pattern Hambäck et al. identify as the mo
 These are the reasons I never pursued publication:
 
 1. **Unnatural system.** Seed trays are a standard tool for measuring giving-up densities, but cottontail rabbits harvesting sunflower seeds from sand is not a natural interaction.
-2. **Forager identity.** Hispid cotton rats also foraged from trays at the site. They seemed to stay close to their burrows, so I placed these trays away from rat burrows. I believe rabbits were the main foragers, but I'm no longer working in this system and can't provide more evidence to support that. If some trays were mostly visited by rats, between-station variation would partly reflect forager species.
+2. **Forager identity.** Rabbits were often seen at the trays, and trays were kept away from rodent burrows and runways. Hispid cotton rats did forage in trays at the site, though, and I have no tracks, cameras, or other systematic records to show who did the foraging. If some stations were mostly visited by rats, differences among stations would partly reflect which species was foraging.
 3. **Sub-optimal foraging claims.** Any claim that rabbits forage sub-optimally (e.g., non-selectively within patches) runs straight back into caveat 1.
-4. **Not a cohesive program.** These were my last experiments at Texas Tech, and I was trying many things to see if the system was viable. Sample sizes are modest (4–8 days × 8 stations per experiment), the experiments ran in different seasons, and comparisons across experiments (e.g., replacement vs. patch assessment) are informal.
+4. **Not a cohesive program.** These were my last experiments at Texas Tech, and I was trying many things to see if the system was viable. Each experiment ran for only 4–5 nights at 6–8 stations, the experiments were spread across different seasons, and comparisons across experiments (e.g., replacement vs. patch assessment) are informal.
 
 ## Repository contents
 
@@ -109,4 +130,6 @@ An earlier round of associational refuge and shared doom tests (data not include
 
 - Emerson SE, Brown JS, Whelan CJ, Schmidt KA (2012) Scale-dependent neighborhood effects: shared doom and associational refuge. *Oecologia* 168:659–670. https://doi.org/10.1007/s00442-011-2144-4
 - Hambäck PA, Inouye BD, Andersson P, Underwood N (2014) Effects of plant neighborhoods on plant–herbivore interactions: resource dilution and associational effects. *Ecology* 95:1370–1383.
+- Schmidt KA (2000) Interactions between food chemistry and predation risk in fox squirrels. *Ecology* 81:2077–2085.
+- Schmidt KA, Brown JS, Morgan RA (1998) Plant defenses as complementary resources: a test with squirrels. *Oikos* 81:130–142.
 - Underwood N, Inouye BD, Hambäck PA (2014) A conceptual framework for associational effects: when do neighbors matter and how would we know? *Quarterly Review of Biology* 89:1–19.
