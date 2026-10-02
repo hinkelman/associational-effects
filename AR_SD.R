@@ -1,6 +1,6 @@
 # AR and SD experiments were separated by a month so analyzing them separately
 library(dplyr)
-library(nlme)
+library(lme4)
 library(car)
 library(ggplot2)
 
@@ -21,21 +21,21 @@ sd = read.csv(file.path("data", "SD.csv")) |>
          PropLogit = boot::logit(Prop),
          SelectivitySun = selectivity(Sun_gud, Sun_init, Ox_gud, Ox_init))
 
-ar_mod = lme(PropLogit ~ Trt, random = ~ 1|Station, data = ar)
+ar_mod = lmer(PropLogit ~ Trt + (1|Station) + (1|Day), data = ar)
 Anova(ar_mod)
 
 # providing the supplement lend to a trend in the right direction
 # but not statistically significant so not taking farther
-ar_mod_supp = lme(PropLogit ~ Trt, random = ~ 1|Station, data = ar_supp)
+ar_mod_supp = lmer(PropLogit ~ Trt + (1|Station) + (1|Day), data = ar_supp)
 Anova(ar_mod_supp)
 
-sd_mod = lme(PropLogit ~ Trt, random = ~ 1|Station, data = sd)
+sd_mod = lmer(PropLogit ~ Trt + (1|Station) + (1|Day), data = sd)
 Anova(sd_mod)
 
 ar_sd_nd = data.frame(Trt = c("I", "II", "III", "IV"))
 
-ar_fit_se = AICcmodavg::predictSE.lme(ar_mod, newdata = ar_sd_nd, level = 0)
-sd_fit_se = AICcmodavg::predictSE.lme(sd_mod, newdata = ar_sd_nd, level = 0)
+ar_fit_se = AICcmodavg::predictSE(ar_mod, newdata = ar_sd_nd, level = 0)
+sd_fit_se = AICcmodavg::predictSE(sd_mod, newdata = ar_sd_nd, level = 0)
 
 ar_sd_pred = cbind(ar_sd_nd, data.frame(Fit = ar_fit_se$fit, SE = ar_fit_se$se.fit)) |> 
   mutate(Background = "Untreated") |> 

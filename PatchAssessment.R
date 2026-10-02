@@ -1,5 +1,5 @@
 library(dplyr)
-library(nlme)
+library(lme4)
 library(car)
 library(ggplot2)
 
@@ -9,13 +9,13 @@ pa = read.csv(file.path("data", "patch_assess.csv")) |>
          Prop = 1 - GUD/Initial,
          PropLogit = boot::logit(Prop))
 
-pa_mod = lme(PropLogit ~ Trt * Food, random = ~ 1|Station, data = pa)
+pa_mod = lmer(PropLogit ~ Trt * Food + (1|Station) + (1|Day), data = pa)
 Anova(pa_mod)
 
 pa_nd = tidyr::crossing(Trt = c("I", "II", "III", "IV"),
                         Food = c("Untreated", "Oxalate"))
 
-pa_fit_se = AICcmodavg::predictSE.lme(pa_mod, newdata = pa_nd, level = 0)
+pa_fit_se = AICcmodavg::predictSE(pa_mod, newdata = pa_nd, level = 0)
 pa_pred = cbind(pa_nd, data.frame(Fit = pa_fit_se$fit, SE = pa_fit_se$se.fit)) |> 
   mutate(Food = factor(Food, levels = c("Untreated", "Oxalate")),
          FitProp = boot::inv.logit(Fit),

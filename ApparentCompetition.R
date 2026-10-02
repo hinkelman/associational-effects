@@ -1,7 +1,7 @@
 # the two AC experiments were separated by about a week so analyzing them separately
 
 library(dplyr)
-library(nlme)
+library(lme4)
 library(car)
 library(ggplot2)
 
@@ -17,16 +17,16 @@ ac_sun = read.csv(file.path("data", "AC_sun_back.csv"), na.strings = ".") |>
          PropLogit = boot::logit(Prop),
          SelectivitySun = selectivity(Sun_gud, Sun_init, Oat_gud, Oat_init))
 
-ac_oat_mod = lme(PropLogit ~ Trt, random = ~ 1|Station, data = ac_oat)
+ac_oat_mod = lmer(PropLogit ~ Trt + (1|Station) + (1|Day), data = ac_oat)
 Anova(ac_oat_mod)
 
-ac_sun_mod = lme(PropLogit ~ Trt, random = ~ 1|Station, data = ac_sun)
+ac_sun_mod = lmer(PropLogit ~ Trt + (1|Station) + (1|Day), data = ac_sun)
 Anova(ac_sun_mod)
 
-ac_nd = expand.grid(Trt = c("I", "II", "III", "IV"))
+ac_nd = data.frame(Trt = c("I", "II", "III", "IV"))
 
-ac_oat_fit_se = AICcmodavg::predictSE.lme(ac_oat_mod, newdata = ac_nd, level = 0)
-ac_sun_fit_se = AICcmodavg::predictSE.lme(ac_sun_mod, newdata = ac_nd, level = 0)
+ac_oat_fit_se = AICcmodavg::predictSE(ac_oat_mod, newdata = ac_nd, level = 0)
+ac_sun_fit_se = AICcmodavg::predictSE(ac_sun_mod, newdata = ac_nd, level = 0)
 
 ac_pred = cbind(ac_nd, data.frame(Fit = ac_oat_fit_se$fit, SE = ac_oat_fit_se$se.fit)) |> 
   mutate(Background = "Oat") |> 

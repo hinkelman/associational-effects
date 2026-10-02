@@ -24,7 +24,7 @@ The design closely follows [Emerson et al. (2012)](https://doi.org/10.1007/s0044
 
 ### Analysis
 
-The response variable throughout is the proportion of seeds harvested (1 − GUD / initial amount), analyzed on the logit scale with a random effect of station. My original analysis plan also treated night as a random effect; the current scripts don't. Within-patch selectivity uses Manly's index (`Functions.R`): 0.5 means that seeds were taken in proportion to their availability, and values above 0.5 mean that untreated seeds were preferred.
+The response variable throughout is the proportion of seeds harvested (1 − GUD / initial amount), analyzed on the logit scale with linear mixed models (`lme4`). Station and night are crossed random effects, because every station received every treatment on every night. p-values are Wald chi-square tests from `car::Anova`. Within-patch selectivity uses Manly's index (`Functions.R`): 0.5 means that seeds were taken in proportion to their availability, and values above 0.5 mean that untreated seeds were preferred.
 
 ### Theory
 
@@ -39,8 +39,8 @@ These experiments were framed around a forager with a fixed *quitting harvest ra
 Each tray had 10 g of a background food and 0, 2, 4, or 6 g of an associational food.
 
 - Adding untreated seeds to oxalate trays increased harvest of the oxalate seeds from about 0.49 to 0.63 (p < 0.001). That is shared doom.
-- Adding oxalate seeds to untreated trays had no effect on harvest of the untreated seeds, which stayed near 0.41 (p = 0.53). That is no refuge.
-- Offering a dish of 12 g of extra oxalate seeds at each station nudged the refuge effect in the predicted direction, but not significantly (p = 0.49).
+- Adding oxalate seeds to untreated trays had no effect on harvest of the untreated seeds, which stayed near 0.41 (p = 0.36). That is no refuge.
+- Offering a dish of 12 g of extra oxalate seeds at each station nudged the refuge effect in the predicted direction, but not significantly (p = 0.21).
 
 ![](figures/AR_SD.png)
 
@@ -59,11 +59,11 @@ The difference between the two foods is marginal (food × amount interaction, p 
 
 If the rabbits judge a patch by how much good food it holds, the asymmetry follows. Adding untreated seeds makes a patch worth working longer, and the oxalate seeds are caught up in that extra effort. Adding oxalate seeds doesn't make the patch any less worth working, so the untreated seeds gain nothing.
 
-The composition × density experiment points the same way. It crossed total amount (8 g vs. 16 g) with oxalate share (25% vs. 75%). If rabbits used a fixed quitting harvest rate for both foods, amount and share should have had independent effects. Instead, doubling the total increased harvest when 25% of the seeds were oxalate, but not when 75% were. The interaction is not significant, so treat this as suggestive.
+The composition × density experiment points the same way. It crossed total amount (8 g vs. 16 g) with oxalate share (25% vs. 75%). If rabbits used a fixed quitting harvest rate for both foods, amount and share should have had independent effects. Doubling the total increased harvest of both foods overall (p ≈ 0.04). For untreated seeds, though, the increase came almost entirely from trays where 25% of the seeds were oxalate (0.67 → 0.77), with little change when 75% were oxalate (0.59 → 0.60). That interaction is marginal (p = 0.08), so treat it as suggestive.
 
 ![](figures/CompDensity.png)
 
-When the second food is also valuable (oats instead of oxalate seeds), adding it increased harvest of an oat background (p < 0.001). The trend was similar but not significant for a sunflower background (p = 0.14).
+When the second food is also valuable (oats instead of oxalate seeds), adding it increased harvest of an oat background (p < 0.001). The trend was similar but weaker for a sunflower background (p = 0.06).
 
 ![](figures/AC.png)
 

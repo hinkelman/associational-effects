@@ -1,5 +1,5 @@
 library(dplyr)
-library(nlme)
+library(lme4)
 library(car)
 library(ggplot2)
 
@@ -13,17 +13,17 @@ replace = read.csv(file.path("data", "replacement.csv")) |>
          SelectivitySun = selectivity(Sun_gud, Sun_init, Ox_gud, Ox_init))
 
 
-replace_mod_sun = lme(PropSunLogit ~ Trt, random = ~ 1|Station, data = filter(replace, !is.na(PropSunLogit)))
+replace_mod_sun = lmer(PropSunLogit ~ Trt + (1|Station) + (1|Day), data = filter(replace, !is.na(PropSunLogit)))
 Anova(replace_mod_sun)
 
-replace_mod_ox = lme(PropOxLogit ~ Trt, random = ~ 1|Station, data = filter(replace, !is.na(PropOxLogit)))
+replace_mod_ox = lmer(PropOxLogit ~ Trt + (1|Station) + (1|Day), data = filter(replace, !is.na(PropOxLogit)))
 Anova(replace_mod_ox)
 
-replace_nd_sun = expand.grid(Trt = c("I", "II", "III", "IV"))
-replace_nd_ox = expand.grid(Trt = c("II", "III", "IV", "V"))
+replace_nd_sun = data.frame(Trt = c("I", "II", "III", "IV"))
+replace_nd_ox = data.frame(Trt = c("II", "III", "IV", "V"))
 
-replace_sun_fit_se = AICcmodavg::predictSE.lme(replace_mod_sun, newdata = replace_nd_sun, level = 0)
-replace_ox_fit_se = AICcmodavg::predictSE.lme(replace_mod_ox, newdata = replace_nd_ox, level = 0)
+replace_sun_fit_se = AICcmodavg::predictSE(replace_mod_sun, newdata = replace_nd_sun, level = 0)
+replace_ox_fit_se = AICcmodavg::predictSE(replace_mod_ox, newdata = replace_nd_ox, level = 0)
 
 replace_pred = cbind(replace_nd_ox, data.frame(Fit = replace_ox_fit_se$fit, SE = replace_ox_fit_se$se.fit)) |> 
   mutate(Food = "Oxalate") |> 

@@ -1,5 +1,5 @@
 library(dplyr)
-library(nlme)
+library(lme4)
 library(car)
 library(ggplot2)
 
@@ -12,17 +12,17 @@ cd = read.csv(file.path("data", "comp_density.csv")) |>
          PropOxLogit = boot::logit(PropOx),
          SelectivityUn = selectivity(Un_gud, Un_init, Ox_gud, Ox_init))
 
-cd_mod_un = lme(PropUnLogit ~ Oxalate*Density, random = ~ 1|Station, data = cd)
+cd_mod_un = lmer(PropUnLogit ~ Oxalate*Density + (1|Station) + (1|Day), data = cd)
 Anova(cd_mod_un)
 
-cd_mod_ox = lme(PropOxLogit ~ Oxalate*Density, random = ~ 1|Station, data = cd)
+cd_mod_ox = lmer(PropOxLogit ~ Oxalate*Density + (1|Station) + (1|Day), data = cd)
 Anova(cd_mod_ox)
 
 cd_nd = tidyr::crossing(Oxalate = c("low", "high"),
                         Density = c("low", "high"))
 
-cd_un_fit_se = AICcmodavg::predictSE.lme(cd_mod_un, newdata = cd_nd, level = 0)
-cd_ox_fit_se = AICcmodavg::predictSE.lme(cd_mod_ox, newdata = cd_nd, level = 0)
+cd_un_fit_se = AICcmodavg::predictSE(cd_mod_un, newdata = cd_nd, level = 0)
+cd_ox_fit_se = AICcmodavg::predictSE(cd_mod_ox, newdata = cd_nd, level = 0)
 
 cd_pred = cbind(cd_nd, data.frame(Fit = cd_ox_fit_se$fit, SE = cd_ox_fit_se$se.fit)) |> 
   mutate(Food = "Oxalate") |> 

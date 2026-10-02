@@ -1,5 +1,5 @@
 library(dplyr)
-library(nlme)
+library(lme4)
 library(car)
 library(ggplot2)
 
@@ -13,14 +13,14 @@ sc = read.csv(file.path("data", "scale.csv")) |>
          PropOxLogit = boot::logit(PropOx),
          SelectivitySun = selectivity(Sun_gud, Sun_init, Ox_gud, Ox_init))
 
-sc_mod_sun = lme(PropSunLogit ~ Trt, random = ~ 1|Station, data = filter(sc, !is.na(PropSunLogit)))
+sc_mod_sun = lmer(PropSunLogit ~ Trt + (1|Station) + (1|Day), data = filter(sc, !is.na(PropSunLogit)))
 Anova(sc_mod_sun)
 
-sc_mod_ox = lme(PropOxLogit ~ Trt, random = ~ 1|Station, data = filter(sc, !is.na(PropOxLogit)))
+sc_mod_ox = lmer(PropOxLogit ~ Trt + (1|Station) + (1|Day), data = filter(sc, !is.na(PropOxLogit)))
 Anova(sc_mod_ox)
 
 # rabbits are nearly non-selective when foods are mixed but selective when foods are separated
-sc_mod_sel = lme(SelectivitySun ~ Trt, random = ~ 1|Station, data = filter(sc, Trt %in% c("III", "IV")))
+sc_mod_sel = lmer(SelectivitySun ~ Trt + (1|Station) + (1|Day), data = filter(sc, Trt %in% c("III", "IV")))
 Anova(sc_mod_sel)
 
 sc |>
@@ -29,11 +29,11 @@ sc |>
   summarise(Mean = mean(SelectivitySun),
             SE = sd(SelectivitySun)/sqrt(n()))
 
-sc_nd_sun = expand.grid(Trt = c("I", "III", "IV"))
-sc_nd_ox = expand.grid(Trt = c("II", "III", "IV"))
+sc_nd_sun = data.frame(Trt = c("I", "III", "IV"))
+sc_nd_ox = data.frame(Trt = c("II", "III", "IV"))
 
-sc_sun_fit_se = AICcmodavg::predictSE.lme(sc_mod_sun, newdata = sc_nd_sun, level = 0)
-sc_ox_fit_se = AICcmodavg::predictSE.lme(sc_mod_ox, newdata = sc_nd_ox, level = 0)
+sc_sun_fit_se = AICcmodavg::predictSE(sc_mod_sun, newdata = sc_nd_sun, level = 0)
+sc_ox_fit_se = AICcmodavg::predictSE(sc_mod_ox, newdata = sc_nd_ox, level = 0)
 
 sc_pred = cbind(sc_nd_ox, data.frame(Fit = sc_ox_fit_se$fit, SE = sc_ox_fit_se$se.fit)) |>
   mutate(Food = "Oxalate") |>
